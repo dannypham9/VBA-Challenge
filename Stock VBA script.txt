@@ -1,0 +1,73 @@
+Sub stock()
+
+For Each ws In Worksheets
+
+Dim ticker As String
+Dim tablerow As Integer
+Dim change As Double
+Dim percent As Double
+Dim volume As Double
+Dim opened As Double
+Dim closed As Double
+Dim firstrow As Double
+
+tablerow = 2
+volume = 0
+firstrow = 2
+
+Range("I1,J1,K1,L1").Font.Bold = True
+
+ws.Cells(1, 9) = "Tickers"
+ws.Cells(1, 10) = "Annual Change"
+ws.Cells(1, 11) = "Annual % Change"
+ws.Cells(1, 12) = "Total Volume"
+
+Last = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+'Loop through all tickers
+For i = 2 To Last
+        
+    If ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+    'Set tickers
+    ticker = ws.Cells(i, 1).Value
+    ws.Range("I" & tablerow).Value = ticker
+    
+    'Identify open and close for tickers
+    opened = ws.Range("C" & firstrow).Value
+    closed = ws.Cells(i, 6).Value
+    
+    'Find annual change by subtracting opening from closing
+    change = closed - opened
+    ws.Range("J" & tablerow).Value = change
+    
+    'Find total volume
+     volume = volume + ws.Cells(i, 7).Value
+     ws.Range("L" & tablerow).Value = volume
+        volume = 0
+    'Percentage change
+        If opened = 0 Then
+            percent = 0
+        Else
+            percent = change / opened
+            ws.Range("K" & tablerow).Value = percent
+            ws.Range("K" & tablerow).NumberFormat = "0.00%"
+        End If
+
+    'Green for positive and red for negative change
+        If ws.Range("J" & tablerow).Value > 0 Then
+            ws.Range("J" & tablerow).Interior.ColorIndex = 4
+        ElseIf ws.Range("J" & tablerow).Value < 0 Then
+            ws.Range("J" & tablerow).Interior.ColorIndex = 3
+        End If
+        
+tablerow = tablerow + 1
+firstrow = i + 1
+        
+    End If
+    
+Next i
+Next ws
+
+
+End Sub
+
